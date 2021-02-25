@@ -1,4 +1,4 @@
-const { getMetadataValue, execCommand } = require('./shellClient');
+const { getMetadataValue, getPlayers, togglePlayingStatus, skip, previous } = require('./playerClient');
 
 let currentPlayer;
 
@@ -27,25 +27,20 @@ const getPlayerMetadata = async (player) => {
     return metadata;
 }
 
-const getPlayers = async () => {
-    const players = await execCommand(`${process.env.PLAYERCTL} -l`);
-    const playersList = players.split(/\s+/);
-    return playersList;
-}
 
 
 const toggleStatus = (event) => {
-    execCommand(`${process.env.PLAYERCTL} play-pause`)
+    togglePlayingStatus(currentPlayer);
     refreshUi(event);
 }
 
 const moveNext = (event) => {
-    execCommand(`${process.env.PLAYERCTL} next`)
+    next(currentPlayer);
     refreshUi(event);
 }
 
 const movePrevious = (event) => {
-    execCommand(`${process.env.PLAYERCTL} previous`)
+    previous(currentPlayer);
     refreshUi(event);
 }
 

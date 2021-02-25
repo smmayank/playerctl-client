@@ -1,4 +1,4 @@
-const { ipcRenderer, ipcMain } = require('electron')
+const { ipcRenderer } = require('electron')
 
 const registerClick = (elementId) => {
   const element = document.getElementById(elementId);
