@@ -1,23 +1,9 @@
+require('dotenv').config();
 const { app, BrowserWindow, ipcMain, ipcRenderer } = require('electron');
 const path = require('path');
-const util = require('util');
-require('dotenv').config();
-const exec = util.promisify(require('child_process').exec);
+const { getPlayerMetadata, getPlayers, toggleStatus, moveNext, movePrevious } = require('./player')
 
-const execResult = async (command) => {
-  try {
-    const req = await exec(command);
-    return req.stdout.trim();
-  } catch (err) {
-    console.error(err);
-    return '';
-  }
-}
-
-const fetchMeta = async (player, meta) => {
-  const metaValue = await execResult(`${process.env.PLAYERCTL} -p ${player} metadata -f "{{${meta}}}"`)
-  return metaValue;
-}
+let currentPlayer = undefined;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -41,6 +27,31 @@ const createWindow = () => {
   if (process.env.DEV) {
     mainWindow.webContents.openDevTools();
   }
+
+  ipcMain.on('polling-refresh-data', async (event) => {
+    const players = await getPlayers();
+    const metadata = {};
+    for (i = 0; i < players.length; i++) {
+      const player = players[i];
+      currentPlayer ||= player;
+      metadata[player] = await getPlayerMetadata(player);
+    }
+    event.reply('refresh-matadata', { currentPlayer, metadata })
+  })
+
+  setInterval(async () => {
+    const players = await getPlayers();
+    const metadata = {};
+    for (i = 0; i < players.length; i++) {
+      const player = players[i];
+      currentPlayer ||= player;
+      metadata[player] = await getPlayerMetadata(player);
+    }
+  }, 1000);
+
+  ipcMain.handle('previous-button-clicked', movePrevious)
+  ipcMain.handle('play-pause-button-clicked', toggleStatus)
+  ipcMain.handle('next-button-clicked', moveNext)
 };
 
 // This method will be called when Electron has finished
@@ -64,44 +75,3 @@ app.on('activate', () => {
     createWindow();
   }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
-
-ipcMain.handle('previous-button-clicked', (event, ...args) => {
-  execResult(`${process.env.PLAYERCTL} -p ${currentPlayer} previous`)
-})
-
-ipcMain.handle('play-pause-button-clicked', (event, ...args) => {
-  execResult(`${process.env.PLAYERCTL} -p ${currentPlayer} play-pause`)
-})
-
-ipcMain.handle('next-button-clicked', (event, ...args) => {
-  execResult(`${process.env.PLAYERCTL} -p ${currentPlayer} next`)
-})
-
-
-
-let currentPlayer = undefined;
-
-setInterval(async () => {
-  const status = await execResult(`${process.env.PLAYERCTL} status`);
-  const players = await execResult(`${process.env.PLAYERCTL} -l`);
-  const playersList = players.split(/\s+/);
-  currentPlayer ||= playersList[0];
-  const metadatas = {};
-  for (let i = 0; i < playersList.length; i++) {
-    const playerName = await fetchMeta(playersList[i], 'playerName');
-    const metadata = {
-      album: await fetchMeta(playerName, 'album'),
-      artist: await fetchMeta(playerName, 'artist'),
-      title: await fetchMeta(playerName, 'title'),
-      artUrl: await fetchMeta(playerName, 'mpris:artUrl'),
-      length: await fetchMeta(playerName, 'mpris:length'),
-      position: await fetchMeta(playerName, 'position'),
-      status: await fetchMeta(playerName, 'status'),
-    }
-    metadatas[`${playerName}`] = metadata;
-  }
-  console.log(metadatas)
-}, 1000);
