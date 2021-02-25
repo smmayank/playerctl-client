@@ -4,29 +4,31 @@ const {
 
 let currentPlayer;
 
-const refreshUi = async (event) => {
-    const players = await getPlayers();
-    const metadata = {};
-    for (let i = 0; i < players.length; i += 1) {
-        const player = players[i];
-        currentPlayer ||= player;
-        metadata[player] = await getPlayerMetadata(player);
-    }
-    event.reply('refresh-matadata', { currentPlayer, metadata });
-};
-
 const getPlayerMetadata = async (player) => {
     const metadata = {
         album: await getMetadataValue(player, 'album'),
         artist: await getMetadataValue(player, 'artist'),
         title: await getMetadataValue(player, 'title'),
         artUrl: await getMetadataValue(player, 'mpris:artUrl'),
-        length: await getMetadataValue(player, 'mpris:length'),
-        position: await getMetadataValue(player, 'position'),
+        length: parseInt(await getMetadataValue(player, 'mpris:length'), 10),
+        position: parseInt(await getMetadataValue(player, 'position'), 10),
         status: await getMetadataValue(player, 'status'),
+        playerName: player,
     };
-    metadata.percent = 100 * Math.floor(metadata.position / metadata.length);
+    metadata.percent = parseInt(100 * (metadata.position / metadata.length), 10);
     return metadata;
+};
+
+const refreshUi = async (event) => {
+    const players = await getPlayers();
+    const playersMeta = await Promise.all(players.map((p) => getPlayerMetadata(p)));
+    const metadata = {};
+    for (let i = 0; i < playersMeta.length; i += 1) {
+        const currentPlayerMeta = playersMeta[i];
+        currentPlayer = currentPlayer || currentPlayerMeta.playerName;
+        metadata[currentPlayerMeta.playerName] = currentPlayerMeta;
+    }
+    event.reply('refresh-matadata', { currentPlayer, metadata });
 };
 
 const toggleStatus = (event) => {

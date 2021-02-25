@@ -1,6 +1,7 @@
 require('dotenv').config();
 const {
     app, BrowserWindow, ipcMain,
+    // eslint-disable-next-line import/no-extraneous-dependencies
 } = require('electron');
 const path = require('path');
 const {
