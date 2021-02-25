@@ -3,7 +3,7 @@ const { ipcRenderer, ipcMain } = require('electron')
 const registerClick = (elementId) => {
   const element = document.getElementById(elementId);
   element.addEventListener('click', () => {
-    ipcRenderer.invoke(`${elementId}-clicked`);
+    ipcRenderer.send(`${elementId}-clicked`);
   })
 };
 
@@ -22,8 +22,6 @@ ipcRenderer.on('refresh-matadata', (event, data) => {
   document.getElementById('album-text').innerHTML = `${album}`;
   document.getElementById('play-pause-button').innerHTML = status === 'Playing' ? 'Playing' : 'Paused';
 });
-
-ipcRenderer.send('polling-refresh-data')
 
 setInterval(() => {
   ipcRenderer.send('polling-refresh-data')

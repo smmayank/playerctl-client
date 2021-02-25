@@ -1,9 +1,7 @@
 require('dotenv').config();
 const { app, BrowserWindow, ipcMain, ipcRenderer } = require('electron');
 const path = require('path');
-const { getPlayerMetadata, getPlayers, toggleStatus, moveNext, movePrevious } = require('./player')
-
-let currentPlayer = undefined;
+const { toggleStatus, moveNext, movePrevious, refreshUi } = require('./player')
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
@@ -28,30 +26,10 @@ const createWindow = () => {
     mainWindow.webContents.openDevTools();
   }
 
-  ipcMain.on('polling-refresh-data', async (event) => {
-    const players = await getPlayers();
-    const metadata = {};
-    for (i = 0; i < players.length; i++) {
-      const player = players[i];
-      currentPlayer ||= player;
-      metadata[player] = await getPlayerMetadata(player);
-    }
-    event.reply('refresh-matadata', { currentPlayer, metadata })
-  })
-
-  setInterval(async () => {
-    const players = await getPlayers();
-    const metadata = {};
-    for (i = 0; i < players.length; i++) {
-      const player = players[i];
-      currentPlayer ||= player;
-      metadata[player] = await getPlayerMetadata(player);
-    }
-  }, 1000);
-
-  ipcMain.handle('previous-button-clicked', movePrevious)
-  ipcMain.handle('play-pause-button-clicked', toggleStatus)
-  ipcMain.handle('next-button-clicked', moveNext)
+  ipcMain.on('polling-refresh-data', refreshUi)
+  ipcMain.on('previous-button-clicked', movePrevious)
+  ipcMain.on('play-pause-button-clicked', toggleStatus)
+  ipcMain.on('next-button-clicked', moveNext)
 };
 
 // This method will be called when Electron has finished

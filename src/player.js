@@ -1,5 +1,18 @@
 const { getMetadataValue, execCommand } = require('./shellClient');
 
+let currentPlayer;
+
+const refreshUi = async (event) => {
+    const players = await getPlayers();
+    const metadata = {};
+    for (i = 0; i < players.length; i++) {
+        const player = players[i];
+        currentPlayer ||= player;
+        metadata[player] = await getPlayerMetadata(player);
+    }
+    event.reply('refresh-matadata', { currentPlayer, metadata })
+}
+
 const getPlayerMetadata = async (player) => {
     const metadata = {
         album: await getMetadataValue(player, 'album'),
@@ -21,19 +34,23 @@ const getPlayers = async () => {
 }
 
 
-const toggleStatus = () => {
+const toggleStatus = (event) => {
     execCommand(`${process.env.PLAYERCTL} play-pause`)
+    refreshUi(event);
 }
 
-const moveNext = () => {
+const moveNext = (event) => {
     execCommand(`${process.env.PLAYERCTL} next`)
+    refreshUi(event);
 }
 
-const movePrevious = () => {
+const movePrevious = (event) => {
     execCommand(`${process.env.PLAYERCTL} previous`)
+    refreshUi(event);
 }
 
 module.exports = {
+    refreshUi,
     getPlayerMetadata,
     getPlayers,
     toggleStatus,
