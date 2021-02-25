@@ -89,18 +89,19 @@ setInterval(async () => {
   const players = await execResult(`${process.env.PLAYERCTL} -l`);
   const playersList = players.split(/\s+/);
   currentPlayer ||= playersList[0];
-  const metadatas = [];
+  const metadatas = {};
   for (let i = 0; i < playersList.length; i++) {
+    const playerName = await fetchMeta(playersList[i], 'playerName');
     const metadata = {
-      album: await fetchMeta(playersList[i], 'album'),
-      artist: await fetchMeta(playersList[i], 'artist'),
-      title: await fetchMeta(playersList[i], 'title'),
-      artUrl: await fetchMeta(playersList[i], 'mpris:artUrl'),
-      length: await fetchMeta(playersList[i], 'mpris:length'),
-      position: await fetchMeta(playersList[i], 'position'),
-      playerName: await fetchMeta(playersList[i], 'playerName'),
-      status: await fetchMeta(playersList[i], 'status'),
+      album: await fetchMeta(playerName, 'album'),
+      artist: await fetchMeta(playerName, 'artist'),
+      title: await fetchMeta(playerName, 'title'),
+      artUrl: await fetchMeta(playerName, 'mpris:artUrl'),
+      length: await fetchMeta(playerName, 'mpris:length'),
+      position: await fetchMeta(playerName, 'position'),
+      status: await fetchMeta(playerName, 'status'),
     }
-    metadatas.push(metadata)
+    metadatas[`${playerName}`] = metadata;
   }
+  console.log(metadatas)
 }, 1000);
