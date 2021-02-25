@@ -1,17 +1,19 @@
-const { getMetadataValue, getPlayers, togglePlayingStatus, skip, previous } = require('./playerClient');
+const {
+    getMetadataValue, getPlayers, togglePlayingStatus, skip, previous,
+} = require('./playerClient');
 
 let currentPlayer;
 
 const refreshUi = async (event) => {
     const players = await getPlayers();
     const metadata = {};
-    for (i = 0; i < players.length; i++) {
+    for (let i = 0; i < players.length; i += 1) {
         const player = players[i];
         currentPlayer ||= player;
         metadata[player] = await getPlayerMetadata(player);
     }
-    event.reply('refresh-matadata', { currentPlayer, metadata })
-}
+    event.reply('refresh-matadata', { currentPlayer, metadata });
+};
 
 const getPlayerMetadata = async (player) => {
     const metadata = {
@@ -22,27 +24,25 @@ const getPlayerMetadata = async (player) => {
         length: await getMetadataValue(player, 'mpris:length'),
         position: await getMetadataValue(player, 'position'),
         status: await getMetadataValue(player, 'status'),
-    }
-    metadata.percent = parseInt(metadata.position / metadata.length * 100);
+    };
+    metadata.percent = 100 * Math.floor(metadata.position / metadata.length);
     return metadata;
-}
-
-
+};
 
 const toggleStatus = (event) => {
     togglePlayingStatus(currentPlayer);
     refreshUi(event);
-}
+};
 
 const moveNext = (event) => {
-    next(currentPlayer);
+    skip(currentPlayer);
     refreshUi(event);
-}
+};
 
 const movePrevious = (event) => {
     previous(currentPlayer);
     refreshUi(event);
-}
+};
 
 module.exports = {
     refreshUi,
@@ -51,4 +51,4 @@ module.exports = {
     toggleStatus,
     moveNext,
     movePrevious,
-}
+};
