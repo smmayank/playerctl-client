@@ -20,6 +20,7 @@ const createWindow = () => {
         maximizable: false,
         height: 205,
         width: 445,
+        icon: path.join(__dirname, 'app.png'),
         resizable: !!process.env.DEV,
         webPreferences: {
             nodeIntegration: true,
