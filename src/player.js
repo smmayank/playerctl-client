@@ -4,6 +4,19 @@ const {
 
 let currentPlayer;
 
+const computeElapsed = (timeInMicro) => {
+    const seconds = parseInt((timeInMicro / 1000000) % 60, 10);
+    const minutes = parseInt((timeInMicro / 60000000) % 60, 10);
+    const hours = parseInt((timeInMicro / 3600000000) % 60, 10);
+    if (hours > 0) {
+        return `${hours}:${minutes}:${seconds}`;
+    }
+    if (minutes) {
+        return `${minutes}:${seconds}`;
+    }
+    return `00:${seconds}`;
+};
+
 const getPlayerMetadata = async (player) => {
     const metadata = {
         album: await getMetadataValue(player, 'album'),
@@ -16,6 +29,7 @@ const getPlayerMetadata = async (player) => {
         playerName: player,
     };
     metadata.percent = parseInt(100 * (metadata.position / metadata.length), 10);
+    metadata.elapsed = computeElapsed(metadata.position);
     return metadata;
 };
 
