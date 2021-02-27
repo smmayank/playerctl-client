@@ -41,7 +41,7 @@ const getPlayerMetadata = async (player) => {
     return metadata;
 };
 
-const refreshUi = async (event) => {
+const getAllData = async () => {
     const players = await getPlayers();
     const playersMeta = await Promise.all(players.map((p) => getPlayerMetadata(p)));
     const metadata = {};
@@ -50,26 +50,23 @@ const refreshUi = async (event) => {
         currentPlayer = currentPlayer || currentPlayerMeta.playerName;
         metadata[currentPlayerMeta.playerName] = currentPlayerMeta;
     }
-    event.reply('refresh-matadata', { currentPlayer, metadata });
+    return { currentPlayer, metadata };
 };
 
-const toggleStatus = (event) => {
+const toggleStatus = () => {
     togglePlayingStatus(currentPlayer);
-    refreshUi(event);
 };
 
-const moveNext = (event) => {
+const moveNext = () => {
     skip(currentPlayer);
-    refreshUi(event);
 };
 
-const movePrevious = (event) => {
+const movePrevious = () => {
     previous(currentPlayer);
-    refreshUi(event);
 };
 
 module.exports = {
-    refreshUi,
+    getAllData,
     getPlayerMetadata,
     getPlayers,
     toggleStatus,

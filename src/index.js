@@ -14,7 +14,7 @@ const timer = document.getElementById('timer');
 
 pauseButton.style.visibility = 'hidden';
 
-const refershUi = (event, data) => {
+const refershUi = (data) => {
     const { currentPlayer, metadata } = data;
     const currentPlayerMetadata = metadata[currentPlayer];
     const {
@@ -50,8 +50,8 @@ pauseButton.onclick = togglePlay;
 nextButton.onclick = moveNext;
 previousButton.onclick = movePrevious;
 
-ipcRenderer.on('refresh-matadata', refershUi);
-ipcRenderer.send('polling-refresh-data');
 setInterval(() => {
-    ipcRenderer.send('polling-refresh-data');
+    ipcRenderer.invoke('polling-refresh-data').then((data) => {
+        refershUi(data);
+    });
 }, 1000);

@@ -1,21 +1,64 @@
 require('dotenv').config();
 const {
-    app, BrowserWindow, ipcMain,
-    // eslint-disable-next-line import/no-extraneous-dependencies
+    app, BrowserWindow, ipcMain, Tray, Menu,
+// eslint-disable-next-line import/no-extraneous-dependencies
 } = require('electron');
 const path = require('path');
-const {
-    toggleStatus, moveNext, movePrevious, refreshUi,
-} = require('./player');
+const player = require('./player');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
     app.quit();
 }
 
+let tray;
+let mainWindow;
+
+const createTray = () => {
+    tray = new Tray(path.join(__dirname, 'app.png'));
+    const menuTemplate = [
+        {
+            label: 'Previous',
+            click: () => {
+                player.movePrevious();
+            },
+        },
+        {
+            label: 'Play / Pause',
+            click: () => {
+                player.toggleStatus();
+            },
+        },
+        {
+            label: 'Next',
+            click: () => {
+                player.moveNext();
+            },
+        },
+        {
+            label: 'Quit',
+            click: () => {
+                app.quit();
+            },
+        },
+    ];
+    if (process.env.DEV) {
+        menuTemplate.push({
+            label: 'Open Dev Tools',
+            click: () => {
+                mainWindow.webContents.openDevTools({
+                    mode: 'detach',
+                });
+            },
+        });
+    }
+    const contextMenu = Menu.buildFromTemplate(menuTemplate);
+    tray.setContextMenu(contextMenu);
+};
+
 const createWindow = () => {
     // Create the browser window.
-    const mainWindow = new BrowserWindow({
+    mainWindow = new BrowserWindow({
         autoHideMenuBar: true,
         maximizable: false,
         height: 205,
@@ -30,21 +73,25 @@ const createWindow = () => {
     // and load the index.html of the app.
     mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-    // Open the DevTools.
-    if (process.env.DEV) {
-        mainWindow.webContents.openDevTools();
-    }
-
-    ipcMain.on('polling-refresh-data', refreshUi);
-    ipcMain.on('previous-button-clicked', movePrevious);
-    ipcMain.on('play-pause-button-clicked', toggleStatus);
-    ipcMain.on('next-button-clicked', moveNext);
+    ipcMain.handle('polling-refresh-data', () => player.getAllData());
+    ipcMain.on('previous-button-clicked', () => {
+        player.movePrevious();
+    });
+    ipcMain.on('play-pause-button-clicked', () => {
+        player.toggleStatus();
+    });
+    ipcMain.on('next-button-clicked', () => {
+        player.moveNext();
+    });
 };
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+app.on('ready', () => {
+    createTray();
+    createWindow();
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
