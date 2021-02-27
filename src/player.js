@@ -4,15 +4,23 @@ const {
 
 let currentPlayer;
 
+const padNumber = (number, paddingLength = 2, paddingChar = '0') => {
+    let result = `${number}`;
+    while (result.length < paddingLength) {
+        result = `${paddingChar}${number}`;
+    }
+    return result;
+};
+
 const computeElapsed = (timeInMicro) => {
     const seconds = parseInt((timeInMicro / 1000000) % 60, 10);
     const minutes = parseInt((timeInMicro / 60000000) % 60, 10);
     const hours = parseInt((timeInMicro / 3600000000) % 60, 10);
     if (hours > 0) {
-        return `${hours}:${minutes}:${seconds}`;
+        return `${hours}:${padNumber(minutes)}:${padNumber(seconds)}`;
     }
     if (minutes) {
-        return `${minutes}:${seconds}`;
+        return `${minutes}:${padNumber(seconds)}`;
     }
     return `00:${seconds}`;
 };
