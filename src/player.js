@@ -1,6 +1,4 @@
-const {
-    getMetadataValue, getPlayers, togglePlayingStatus, skip, previous,
-} = require('./playerClient');
+const client = require('./client');
 
 let currentPlayer;
 
@@ -27,13 +25,13 @@ const computeElapsed = (timeInMicro) => {
 
 const getPlayerMetadata = async (player) => {
     const metadata = {
-        album: await getMetadataValue(player, 'album'),
-        artist: await getMetadataValue(player, 'artist'),
-        title: await getMetadataValue(player, 'title'),
-        artUrl: await getMetadataValue(player, 'mpris:artUrl'),
-        length: parseInt(await getMetadataValue(player, 'mpris:length'), 10),
-        position: parseInt(await getMetadataValue(player, 'position'), 10),
-        status: await getMetadataValue(player, 'status'),
+        album: await client.getMetadataValue(player, 'album'),
+        artist: await client.getMetadataValue(player, 'artist'),
+        title: await client.getMetadataValue(player, 'title'),
+        artUrl: await client.getMetadataValue(player, 'mpris:artUrl'),
+        length: parseInt(await client.getMetadataValue(player, 'mpris:length'), 10),
+        position: parseInt(await client.getMetadataValue(player, 'position'), 10),
+        status: await client.getMetadataValue(player, 'status'),
         playerName: player,
     };
     metadata.percent = parseInt(100 * (metadata.position / metadata.length), 10);
@@ -42,7 +40,7 @@ const getPlayerMetadata = async (player) => {
 };
 
 const getAllData = async () => {
-    const players = await getPlayers();
+    const players = await client.getPlayers();
     const playersMeta = await Promise.all(players.map((p) => getPlayerMetadata(p)));
     const metadata = {};
     for (let i = 0; i < playersMeta.length; i += 1) {
@@ -54,21 +52,20 @@ const getAllData = async () => {
 };
 
 const toggleStatus = () => {
-    togglePlayingStatus(currentPlayer);
+    client.togglePlayingStatus(currentPlayer);
 };
 
 const moveNext = () => {
-    skip(currentPlayer);
+    client.skip(currentPlayer);
 };
 
 const movePrevious = () => {
-    previous(currentPlayer);
+    client.previous(currentPlayer);
 };
 
 module.exports = {
     getAllData,
     getPlayerMetadata,
-    getPlayers,
     toggleStatus,
     moveNext,
     movePrevious,

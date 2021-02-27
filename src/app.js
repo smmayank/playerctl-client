@@ -6,6 +6,8 @@ const {
 const path = require('path');
 const player = require('./player');
 
+const getStaticAsset = (file) => path.join(`${__dirname}/../static`, file);
+
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
     app.quit();
@@ -15,7 +17,7 @@ let tray;
 let mainWindow;
 
 const createTray = () => {
-    tray = new Tray(path.join(__dirname, 'app.png'));
+    tray = new Tray(getStaticAsset('app.png'));
     const menuTemplate = [
         {
             label: 'Previous',
@@ -71,7 +73,7 @@ const createWindow = () => {
     });
 
     // and load the index.html of the app.
-    mainWindow.loadFile(path.join(__dirname, 'index.html'));
+    mainWindow.loadFile(getStaticAsset('index.html'));
 
     ipcMain.handle('polling-refresh-data', () => player.getAllData());
     ipcMain.on('previous-button-clicked', () => {
