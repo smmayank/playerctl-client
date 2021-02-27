@@ -1,12 +1,12 @@
 require('dotenv').config();
 const {
     app, BrowserWindow, ipcMain, Tray, Menu,
-// eslint-disable-next-line import/no-extraneous-dependencies
+    // eslint-disable-next-line import/no-extraneous-dependencies
 } = require('electron');
 const path = require('path');
-const player = require('./player');
+const player = require('./src/player');
 
-const getStaticAsset = (file) => path.join(`${__dirname}/../static`, file);
+const getStaticAsset = (file) => path.join(`${__dirname}/static`, file);
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
