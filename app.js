@@ -16,8 +16,26 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
 let tray;
 let mainWindow;
 
+const createWindow = () => {
+    // Create the browser window.
+    mainWindow = new BrowserWindow({
+        autoHideMenuBar: true,
+        maximizable: false,
+        height: 205,
+        width: 445,
+        icon: getStaticAsset('app.png'),
+        resizable: !!process.env.DEV,
+        webPreferences: {
+            nodeIntegration: true,
+        },
+    });
+
+    // and load the index.html of the app.
+    mainWindow.loadFile(getStaticAsset('index.html'));
+};
+
 const createTray = () => {
-    tray = new Tray(getStaticAsset('app.png'));
+    tray = new Tray(getStaticAsset('tray.png'));
     const menuTemplate = [
         {
             label: 'Previous',
@@ -58,35 +76,6 @@ const createTray = () => {
     tray.setContextMenu(contextMenu);
 };
 
-const createWindow = () => {
-    // Create the browser window.
-    mainWindow = new BrowserWindow({
-        autoHideMenuBar: true,
-        maximizable: false,
-        height: 205,
-        width: 445,
-        icon: path.join(__dirname, 'app.png'),
-        resizable: !!process.env.DEV,
-        webPreferences: {
-            nodeIntegration: true,
-        },
-    });
-
-    // and load the index.html of the app.
-    mainWindow.loadFile(getStaticAsset('index.html'));
-
-    ipcMain.handle('polling-refresh-data', () => player.getAllData());
-    ipcMain.on('previous-button-clicked', () => {
-        player.movePrevious();
-    });
-    ipcMain.on('play-pause-button-clicked', () => {
-        player.toggleStatus();
-    });
-    ipcMain.on('next-button-clicked', () => {
-        player.moveNext();
-    });
-};
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -110,4 +99,15 @@ app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
         createWindow();
     }
+});
+
+ipcMain.handle('polling-refresh-data', () => player.getAllData());
+ipcMain.on('previous-button-clicked', () => {
+    player.movePrevious();
+});
+ipcMain.on('play-pause-button-clicked', () => {
+    player.toggleStatus();
+});
+ipcMain.on('next-button-clicked', () => {
+    player.moveNext();
 });

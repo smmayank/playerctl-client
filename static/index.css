@@ -228,3 +228,7 @@ p {
 .expend svg:hover g polygon {
   fill: #ef6dbc;
 }
+
+path {
+  fill: white;
+}
