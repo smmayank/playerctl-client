@@ -7,31 +7,42 @@
 </head>
 
 <body>
-  <div class="player">
-    <ul>
-      <li class="cover"><img id="album-art" />
-      </li>
-      <li class="info">
-        <h1 id="artist">...</h1>
-        <h4 id="album">...</h4>
-        <h2 id="title">...</h2>
-
-        <div class="button-items">
-          <div id="slider">
-            <div id="elapsed"></div>
-          </div>
-          <p id="timer">0:00</p>
-          <div class="controls">
-            <img id="previous" src="previous.svg" class="step-backward" xml:space="preserve">
-            <img id="play" src="play-button.svg" xml:space="preserve">
-            <img id="pause" src="pause-button.svg" xml:space="preserve">
-            <img id="next" src="skip-button.svg" class="step-foreward" xml:space="preserve">
-            </span>
-          </div>
-        </div>
-      </li>
-    </ul>
+  <div class="container">
+    <div class="album-art-container">
+      <img id="cover-image" src="https://i.picsum.photos/id/990/180/180.jpg?hmac=BfJKqjwkxRhgkD9cJwrGKRfDleUoaW_3ei7Y_cM66ZM">
+    </div>
+    <div class="player-container">
+      <h1 class="side-to-side player-text" id="album">Album name could be super long</h1>
+      <h4 class="side-to-side player-text" id="artist">Artist name could be super long</h4>
+      <h2 class="side-to-side player-text" id="title">Title name can eb long too you know</h2>
+      <div>
+        <progress class="side-to-side" id="progress" value="10" max="100"></progress>
+        <h5 class="player-text" id="elapsed">00:00</h5>
+      </div>
+      <div class="player-controls">
+        <svg id="previous">
+          <!-- <circle cx="25" cy="25" r="24" /> -->
+          <polygon points="15,15 20,15 20,35 15,35"></polygon>
+          <polygon points="35,15 20,25 35,35"></polygon>
+        </svg>
+        <svg id="play">
+          <circle cx="25" cy="25" r="20" />
+          <polygon points="20,15 35,25 20,35"></polygon>
+        </svg>
+        <svg id="pause">
+          <circle cx="25" cy="25" r="20" />
+          <polygon points="15,15 22,15 22,35 15,35"></polygon>
+          <polygon points="28,15 35,15 35,35 28,35"></polygon>
+        </svg>
+        <svg id="next">
+          <!-- <circle cx="25" cy="25" r="24" /> -->
+          <polygon points="15,15 30,25 15,35"></polygon>
+          <polygon points="30,15 35,15 35,35 30,35"></polygon>
+        </svg>
+      </div>
+    </div>
   </div>
+  
   <script src="index.js"></script>
 </body>
 

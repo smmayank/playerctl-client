@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { ipcRenderer } = require('electron');
 
-const albumArtImage = document.getElementById('album-art');
+const albumArtImage = document.getElementById('cover-image');
 const artistText = document.getElementById('artist');
 const albumText = document.getElementById('album');
 const titleText = document.getElementById('title');
@@ -9,8 +9,8 @@ const playButton = document.getElementById('play');
 const pauseButton = document.getElementById('pause');
 const nextButton = document.getElementById('next');
 const previousButton = document.getElementById('previous');
-const playhead = document.getElementById('elapsed');
-const timer = document.getElementById('timer');
+const playhead = document.getElementById('progress');
+const timer = document.getElementById('elapsed');
 
 pauseButton.style.visibility = 'hidden';
 
@@ -31,7 +31,7 @@ const refershUi = (data) => {
         playButton.style.visibility = 'visible';
         pauseButton.style.visibility = 'hidden';
     }
-    playhead.style.width = `${percent}%`;
+    playhead.value = percent;
     timer.innerHTML = elapsed;
 };
 
