@@ -12,7 +12,7 @@ const previousButton = document.getElementById('previous');
 const playhead = document.getElementById('progress');
 const timer = document.getElementById('elapsed');
 
-pauseButton.style.visibility = 'hidden';
+pauseButton.style.display = 'none';
 
 const refershUi = (data) => {
     const { currentPlayer, metadata } = data;
@@ -25,11 +25,11 @@ const refershUi = (data) => {
     artistText.innerHTML = artist;
     titleText.innerHTML = title;
     if (status === 'Playing') {
-        pauseButton.style.visibility = 'visible';
-        playButton.style.visibility = 'hidden';
+        playButton.style.display = 'none';
+        pauseButton.style.display = 'inline';
     } else {
-        playButton.style.visibility = 'visible';
-        pauseButton.style.visibility = 'hidden';
+        pauseButton.style.display = 'none';
+        playButton.style.display = 'inline';
     }
     playhead.value = percent;
     timer.innerHTML = elapsed;
