@@ -1,10 +1,12 @@
-require('dotenv').config();
+const fixPath = require('fix-path');
 const {
     app, BrowserWindow, ipcMain, Tray, Menu,
     // eslint-disable-next-line import/no-extraneous-dependencies
 } = require('electron');
 const path = require('path');
 const player = require('./src/player');
+
+fixPath();
 
 const getStaticAsset = (file) => path.join(`${__dirname}/static`, file);
 
@@ -21,8 +23,8 @@ const createWindow = () => {
     mainWindow = new BrowserWindow({
         autoHideMenuBar: true,
         maximizable: false,
-        height: 205,
-        width: 445,
+        height: 240,
+        width: 620,
         icon: getStaticAsset('app.png'),
         resizable: !!process.env.DEV,
         webPreferences: {
@@ -61,17 +63,15 @@ const createTray = () => {
                 app.quit();
             },
         },
-    ];
-    if (process.env.DEV) {
-        menuTemplate.push({
+        {
             label: 'Open Dev Tools',
             click: () => {
                 mainWindow.webContents.openDevTools({
                     mode: 'detach',
                 });
             },
-        });
-    }
+        },
+    ];
     const contextMenu = Menu.buildFromTemplate(menuTemplate);
     tray.setContextMenu(contextMenu);
 };

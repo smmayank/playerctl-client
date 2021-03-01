@@ -1,36 +1,38 @@
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
+const playerctl = 'playerctl';
+
 const execCommand = async (command) => {
     try {
         const req = await exec(command);
         return req.stdout.trim();
     } catch (err) {
-        return '';
+        return `${err}`;
     }
 };
 
 const getPlayers = async () => {
-    const players = await execCommand(`${process.env.PLAYERCTL} -l`);
+    const players = await execCommand(`${playerctl} -l`);
     const playersList = players.split(/\s+/);
     return playersList;
 };
 
 const getMetadataValue = async (player, meta) => {
-    const metaValue = await execCommand(`${process.env.PLAYERCTL} -p ${player} metadata -f "{{${meta}}}"`);
+    const metaValue = await execCommand(`${playerctl} -p ${player} metadata -f "{{${meta}}}"`);
     return metaValue;
 };
 
 const togglePlayingStatus = async (player) => {
-    execCommand(`${process.env.PLAYERCTL} -p ${player} play-pause`);
+    execCommand(`${playerctl} -p ${player} play-pause`);
 };
 
 const skip = async (player) => {
-    execCommand(`${process.env.PLAYERCTL} -p ${player} next`);
+    execCommand(`${playerctl} -p ${player} next`);
 };
 
 const previous = async (player) => {
-    execCommand(`${process.env.PLAYERCTL} -p ${player} previous`);
+    execCommand(`${playerctl} -p ${player} previous`);
 };
 
 module.exports = {
